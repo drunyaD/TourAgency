@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TourAgency.BLL.DTO;
+using TourAgency.BLL.Models;
 
 namespace TourAgency.BLL.Interfaces
 {
@@ -17,6 +18,7 @@ namespace TourAgency.BLL.Interfaces
         void DeleteCountry(int countryId);
         void EditCity(CityDto cityDto);
         void EditTour(TourDto tourDto);
+        void AddUserToTour(int tourId, string UserName);
         TourDto GetTour(int tourId);
         CityDto GetCity(int cityId);
         CountryDto GetСountry(int countryId);
@@ -24,6 +26,7 @@ namespace TourAgency.BLL.Interfaces
         IEnumerable<CityDto> GetCities();
         IEnumerable<TourDto> GetTours();
         IEnumerable<TourDto> GetToursByOptions(SearchModel searchModel);
+        IEnumerable<TourDto> GetToursByUser(string userName);
 
     }
 }

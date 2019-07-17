@@ -16,6 +16,9 @@ namespace TourAgency.BLL.Infrastructure
 #pragma warning disable CS0618 
             Mapper.Initialize(config =>
             {
+
+                config.CreateMap<Role, RoleDto>();
+
                 config.CreateMap<Image, byte[]>()
                 .ConstructUsing(i => i.Picture);
 

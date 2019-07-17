@@ -13,6 +13,7 @@ namespace TourAgency.DAL.EF
 {
     public class AgencyContext : IdentityDbContext<User>
     {
+
         public DbSet<City> Cities {get; set;}
         public DbSet<Country> Countries { get; set; }
         public DbSet<Node> Nodes { get; set; }
@@ -24,6 +25,7 @@ namespace TourAgency.DAL.EF
         }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+
             base.OnModelCreating(modelBuilder);
         }
         protected virtual void InitializeDatabase()
@@ -40,8 +42,8 @@ namespace TourAgency.DAL.EF
     {
         public new void Seed(AgencyContext db)
         {
-            var storeStore = new RoleStore<Role>(db);
-            var roleManager = new AppRoleManager(storeStore);
+            var roleStore = new RoleStore<Role>(db);
+            var roleManager = new AppRoleManager(roleStore);
             roleManager.Create(new Role() { Name = "user" });
             roleManager.Create(new Role() { Name = "moderator" });
             roleManager.Create(new Role() { Name = "administrator" });
@@ -62,6 +64,7 @@ namespace TourAgency.DAL.EF
             db.Countries.Add(new Country { Name = "Чехия" });
             db.Countries.Add(new Country { Name = "Румыния" });
 
+            db.SaveChanges();
             db.Cities.Add(new City
             {
                 Name = "Киев",

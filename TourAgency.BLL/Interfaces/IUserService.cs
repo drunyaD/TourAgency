@@ -10,10 +10,13 @@ namespace TourAgency.BLL.Interfaces
 {
     public interface IUserService : IDisposable
     {
-        void Create(UserDto userDto);
+        string Create(UserDto userDto);
         ClaimsIdentity Authenticate(UserDto userDto);
         UserDto GetUser(string userId);
         IEnumerable<UserDto> GetUsers();
-        void ChangeRole(string userId, string roleName);
+        IEnumerable<UserDto> GetUsersByTour(int tourId);
+        void ChangeRole(string userId, RoleDto roleDto);
+        RoleDto GetRole(string roleId);
+        IEnumerable<RoleDto> GetRoles();
     }
 }

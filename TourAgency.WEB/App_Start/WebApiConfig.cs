@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using TourAgency.WEB.Validation;
 
 namespace TourAgency.WEB
 {
@@ -13,6 +14,7 @@ namespace TourAgency.WEB
 
             // Маршруты веб-API
             config.MapHttpAttributeRoutes();
+            config.Filters.Add(new ValidateModelAttribute());
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",

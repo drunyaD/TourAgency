@@ -10,8 +10,8 @@ namespace TourAgency.DAL.Entities
 {
     public class User: IdentityUser
     {
-        [ForeignKey("City")]
-        public int CityId { get; set; }
+        public int? CityId { get; set; }
+        [ForeignKey("CityId")]
         public virtual City City { get; set; }
         public virtual ICollection<Tour> Tours { get; set; }
         public User()

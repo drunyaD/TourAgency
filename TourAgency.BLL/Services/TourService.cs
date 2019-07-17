@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TourAgency.BLL.DTO;
 using TourAgency.BLL.Interfaces;
+using TourAgency.BLL.Models;
 using TourAgency.DAL.Entities;
 using TourAgency.DAL.Interfaces;
 
@@ -54,21 +56,8 @@ namespace TourAgency.BLL.Services
             Database.Save();
             return country.Id;
         }
-        //test adding nodes and tour
         public int AddTour(TourDto tourDto)
         {
-            if (tourDto.StartDate > tourDto.FinishDate || tourDto.StartDate < DateTime.Now)
-            {
-                throw new ValidationException("Incorrect datetime gap");
-            }
-            if (tourDto.Price <= 0)
-            {
-                throw new ValidationException("Price must be > 0");
-            }
-            if (tourDto.MaxCapacity <= 0)
-            {
-                throw new ValidationException("MaxCapacity must be > 0");
-            }
 
             Tour tour = new Tour
             {
@@ -171,17 +160,9 @@ namespace TourAgency.BLL.Services
                 throw new ValidationException("No tour with such id exists");
             }
 
-            if (tourDto.StartDate > tourDto.FinishDate || tourDto.StartDate < DateTime.Now)
+            if (tourDto.MaxCapacity < tourDto.UserNames.Count())
             {
-                throw new ValidationException("Incorrect datetime gap");
-            }
-            if (tourDto.Price <= 0)
-            {
-                throw new ValidationException("Price must be > 0");
-            }
-            if (tourDto.MaxCapacity <= 0)
-            {
-                throw new ValidationException("MaxCapacity must be > 0");
+                throw new ValidationException("Too much people registred");
             }
 
             tour.Name = tourDto.Name;
@@ -190,8 +171,16 @@ namespace TourAgency.BLL.Services
             tour.FinishDate = tourDto.FinishDate;
             tour.MaxCapacity = tourDto.MaxCapacity;
             tour.Price = tourDto.Price;
-            tour.Images.Clear();
-            tour.Nodes.Clear();
+
+            foreach (var i in Database.Images.Find(i => i.TourId == tourDto.Id))
+            {
+                Database.Images.Delete(i);
+            }
+
+            foreach (var n in Database.Nodes.Find(n => n.TourId == tourDto.Id))
+            {
+                Database.Nodes.Delete(n);
+            }
 
             foreach (var picture in tourDto.Images)
             {
@@ -213,14 +202,13 @@ namespace TourAgency.BLL.Services
                     OrderNumber = i,
                     CityId = cityDto.Id,
                     City = city,
-                    Tour = tour
+                    Tour = tour,
                 };
                 Database.Nodes.Create(node);
                 tour.Nodes.Add(node);
-
             }
             Database.Tours.Update(tour);
-            Database.Save   ();
+            Database.Save();
         }
 
         public IEnumerable<CityDto> GetCities()
@@ -275,8 +263,7 @@ namespace TourAgency.BLL.Services
                 tours = tours.Where(t => t.Name.IndexOf(searchModel.SearchString) != -1
                 || t.Description.IndexOf(searchModel.SearchString) != -1);
             if (searchModel.CountryId.HasValue)
-                tours = tours.Where(t => t.Nodes.Select(n => 
-                n.City.CountryId).Any(id => id == searchModel.CountryId));
+                tours = tours.Where(t => t.Nodes.Where(n => n.City.Country.Id == searchModel.CountryId).Any());
             return Mapper.Map<IEnumerable<Tour>, IEnumerable<TourDto>>(tours);
         }
 
@@ -293,6 +280,25 @@ namespace TourAgency.BLL.Services
         public void Dispose()
         {
             Database.Dispose();
+        }
+
+        public IEnumerable<TourDto> GetToursByUser(string userName)
+        {
+            return Mapper.Map<IEnumerable<Tour>,IEnumerable<TourDto>>(
+                Database.Tours.Find(t => t.Users.Where(u => u.UserName == userName).Any()));
+        }
+
+        public void AddUserToTour(int tourId, string userName)
+        {
+            var tour = Database.Tours.Get(tourId);
+            if (tour == null)
+            {
+                throw new ArgumentException ("No tour with such id exists");
+            }
+            var userTask = Database.UserManager.FindByNameAsync(userName);
+            tour.Users.Add(userTask.Result);
+            Database.Tours.Update(tour);
+            Database.Save();
         }
     }
 }
