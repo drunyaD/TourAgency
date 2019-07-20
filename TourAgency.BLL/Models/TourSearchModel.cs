@@ -6,8 +6,19 @@ using System.Threading.Tasks;
 
 namespace TourAgency.BLL.Models
 {
-    public class SearchModel
+    public enum SortState
     {
+        NameAsc,
+        NameDesc,
+        PriceAsc,
+        PriceDesc,
+        DateAsc,
+        DateDesc,
+    }
+
+    public class TourSearchModel
+    {
+        public SortState? SortState { get; set; }
         public bool? NotFullOnly { get; set; }
         public int? MinPrice { get; set; }
         public int? MaxPrice { get; set; }

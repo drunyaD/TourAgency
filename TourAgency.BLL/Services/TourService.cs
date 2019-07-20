@@ -246,7 +246,7 @@ namespace TourAgency.BLL.Services
             return Mapper.Map<IEnumerable<Tour>, IEnumerable<TourDto>>(Database.Tours.GetAll());
         }
 
-        public IEnumerable<TourDto> GetToursByOptions(SearchModel searchModel)
+        public IEnumerable<TourDto> GetToursByOptions(TourSearchModel searchModel)
         {
             var tours = Database.Tours.GetAll();
             if (searchModel.MinPrice.HasValue)
@@ -264,6 +264,23 @@ namespace TourAgency.BLL.Services
                 || t.Description.IndexOf(searchModel.SearchString) != -1);
             if (searchModel.CountryId.HasValue)
                 tours = tours.Where(t => t.Nodes.Where(n => n.City.Country.Id == searchModel.CountryId).Any());
+
+            if(searchModel.SortState != null)
+            {
+                if (searchModel.SortState == SortState.NameAsc)
+                    tours = tours.OrderBy(o => o.Name);
+                if (searchModel.SortState == SortState.NameDesc)
+                    tours = tours.OrderByDescending(o => o.Name);
+                if (searchModel.SortState == SortState.PriceAsc)
+                    tours = tours.OrderBy(o => o.Price);
+                if (searchModel.SortState == SortState.PriceDesc)
+                    tours = tours.OrderByDescending(o => o.Price);
+                if (searchModel.SortState == SortState.DateAsc)
+                    tours = tours.OrderBy(o => o.StartDate).ThenBy(o => o.FinishDate);
+                if (searchModel.SortState == SortState.DateDesc)
+                    tours = tours.OrderByDescending(o => o.StartDate)
+                                 .ThenByDescending(o => o.FinishDate);
+            }
             return Mapper.Map<IEnumerable<Tour>, IEnumerable<TourDto>>(tours);
         }
 

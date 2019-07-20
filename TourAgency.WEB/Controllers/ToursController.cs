@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -54,7 +55,8 @@ namespace TourAgency.WEB.Controllers
         
 
         [AllowAnonymous]
-        public HttpResponseMessage GetTours([FromUri] SearchModel searchModel)
+        public HttpResponseMessage GetTours([FromUri] TourSearchModel searchModel, 
+            [FromUri] PagingModel pagingModel)
         {
             var tourDtos = Service.GetToursByOptions(searchModel);
             var mapper = new MapperConfiguration(cfg =>
@@ -63,6 +65,26 @@ namespace TourAgency.WEB.Controllers
                 cfg.CreateMap<TourDto, TourModel>();
             }).CreateMapper();
             var tours = mapper.Map<IEnumerable<TourDto>, List<TourModel>>(tourDtos);
+
+            int TotalCount = tours.Count();
+            int CurrentPage = pagingModel.PageNumber;
+            int PageSize = pagingModel.PageSize;
+            int TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
+            tours = tours.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
+            var previousPage = CurrentPage > 1 ? "Yes" : "No";
+            var nextPage = CurrentPage < TotalPages ? "Yes" : "No";
+
+            var paginationMetadata = new
+            {
+                totalCount = TotalCount,
+                pageSize = PageSize,
+                currentPage = CurrentPage,
+                totalPages = TotalPages,
+                previousPage,
+                nextPage
+            };
+
+            HttpContext.Current.Response.Headers.Add("Paging-Headers", JsonConvert.SerializeObject(paginationMetadata));
             return Request.CreateResponse(HttpStatusCode.OK, tours);
         }
 

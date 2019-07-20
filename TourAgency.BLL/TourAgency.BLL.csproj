@@ -69,7 +69,7 @@
     <Compile Include="Infrastructure\DalModule.cs" />
     <Compile Include="Interfaces\ITourService.cs" />
     <Compile Include="Interfaces\IUserService.cs" />
-    <Compile Include="Models\SearchModel.cs" />
+    <Compile Include="Models\TourSearchModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\TourService.cs" />
     <Compile Include="Services\UserService.cs" />

@@ -77,7 +77,7 @@ namespace TourAgency.WEB.Controllers
         [HttpDelete]
         [Route("api/countries/{countryId}")]
         [Authorize(Roles = "administrator, moderator")]
-        public HttpResponseMessage DeleteCity(int countryId)
+        public HttpResponseMessage DeleteCountry(int countryId)
         {
             try
             {

@@ -25,7 +25,7 @@ namespace TourAgency.BLL.Interfaces
         IEnumerable<CountryDto> GetCountries();
         IEnumerable<CityDto> GetCities();
         IEnumerable<TourDto> GetTours();
-        IEnumerable<TourDto> GetToursByOptions(SearchModel searchModel);
+        IEnumerable<TourDto> GetToursByOptions(TourSearchModel searchModel);
         IEnumerable<TourDto> GetToursByUser(string userName);
 
     }

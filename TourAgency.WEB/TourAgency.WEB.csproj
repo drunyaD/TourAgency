@@ -218,6 +218,7 @@
     <Compile Include="Models\CityModel.cs" />
     <Compile Include="Models\CountryModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
+    <Compile Include="Models\PagingModel.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Models\RoleModel.cs" />
     <Compile Include="Models\TourModel.cs" />
