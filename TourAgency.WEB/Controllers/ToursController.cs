@@ -52,7 +52,7 @@ namespace TourAgency.WEB.Controllers
                 Images = tourDto.Images,
             });
         }
-        
+
 
         [AllowAnonymous]
         public HttpResponseMessage GetTours([FromUri] TourSearchModel searchModel, 
