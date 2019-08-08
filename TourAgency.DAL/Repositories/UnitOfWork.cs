@@ -13,7 +13,7 @@ namespace TourAgency.DAL.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private bool _disposed;
+        private bool _disposed = false;
         private readonly AgencyContext _db;
         private Repository<City> _cityRepository;
         private Repository<Tour> _tourRepository;
@@ -59,12 +59,12 @@ namespace TourAgency.DAL.Repositories
 
         public virtual void Dispose(bool disposing)
         {
-            if (!_disposed) return;
+            if (_disposed) return;
             if (disposing)
             {
-                _db.Dispose();
-                _userManager.Dispose();
-                _roleManager.Dispose();
+                if (_db != null) _db.Dispose();
+                if (_userManager != null) _userManager.Dispose();
+                if (_roleManager != null) _roleManager.Dispose();
             }
 
             _disposed = true;

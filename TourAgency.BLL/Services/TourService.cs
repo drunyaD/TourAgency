@@ -16,6 +16,7 @@ namespace TourAgency.BLL.Services
 {
     public class TourService : ITourService
     {
+        private bool _disposed = false;
         private IUnitOfWork Database { get; }
         public TourService(IUnitOfWork uow)
         {
@@ -294,9 +295,21 @@ namespace TourAgency.BLL.Services
             return Mapper.Map<Country, CountryDto>(country);
         }
 
+        public virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing)
+            {
+                Database.Dispose();
+            }
+
+            _disposed = true;
+        }
+
         public void Dispose()
         {
-            Database.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public IEnumerable<TourDto> GetToursByUser(string userName)

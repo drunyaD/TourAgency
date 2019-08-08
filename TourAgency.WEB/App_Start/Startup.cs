@@ -39,8 +39,6 @@ namespace TourAgency.WEB.App_Start
             WebApiConfig.Register(config);
             app.UseWebApi(config);
 
-
-
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);

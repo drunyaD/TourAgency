@@ -16,6 +16,7 @@ namespace TourAgency.BLL.Services
 {
     public class UserService : IUserService
     {
+        private bool _disposed = false;
         private IUnitOfWork Database { get; }
 
         public UserService(IUnitOfWork uow)
@@ -63,9 +64,21 @@ namespace TourAgency.BLL.Services
             return claim;
         }
 
+        public virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing)
+            {
+                Database.Dispose();
+            }
+
+            _disposed = true;
+        }
+
         public void Dispose()
         {
-            Database.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public UserDto GetUser(string userId)

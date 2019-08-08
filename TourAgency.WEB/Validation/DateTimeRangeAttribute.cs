@@ -51,7 +51,7 @@ namespace TourAgency.WEB.Validation
                 }
                 else
                 {
-                    return new ValidationResult("Incorrect time gap haha ou lose", new[] { validationContext.MemberName, MaxTimePropertyName });
+                    return new ValidationResult("Incorrect time gap", new[] { validationContext.MemberName, MaxTimePropertyName });
                 }
 
             }
