@@ -87,15 +87,22 @@ namespace TourAgency.WEB.Controllers
             HttpContext.Current.Response.Headers.Add("Paging-Headers", JsonConvert.SerializeObject(paginationMetadata));
             return Request.CreateResponse(HttpStatusCode.OK, tours);
         }
-
-        [Authorize(Roles = "administrator, moderator")]
-        public HttpResponseMessage GetToursByUserId(string userName)
+        [Authorize]
+        public HttpResponseMessage GetToursByUserName(string userName)
         {
             var principal = HttpContext.Current.User;
             if (userName == principal.Identity.Name || principal.IsInRole("administrator")
                 || principal.IsInRole("moderator"))
             {
-                var tourDtos = Service.GetToursByUser(userName);
+                IEnumerable<TourDto> tourDtos;
+                try
+                {
+                    tourDtos = Service.GetToursByUser(userName);
+                }
+                catch(ArgumentException e)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, e.Message);
+                }
                 var mapper = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<CityDto, CityModel>();
@@ -174,7 +181,7 @@ namespace TourAgency.WEB.Controllers
         }
 
         
-        [Authorize(Roles = "user")]
+        
         [HttpPost]
         [Route("api/tours/{tourId}/users")]
         public HttpResponseMessage AddUserToTour([FromUri]int tourId)
@@ -189,7 +196,21 @@ namespace TourAgency.WEB.Controllers
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
+        }
 
+        [Authorize(Roles = "user")]
+        [Route("api/tours/{tourId}/users")]
+        public HttpResponseMessage DeleteUserFromTour([FromUri]int tourId)
+        {
+            try
+            {
+                Service.DeleteUserFromTour(tourId, HttpContext.Current.User.Identity.Name);
+            }
+            catch (ArgumentException e)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound, e.Message);
+            }
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [HttpDelete]

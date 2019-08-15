@@ -18,7 +18,8 @@ namespace TourAgency.BLL.Interfaces
         void DeleteCountry(int countryId);
         void EditCity(CityDto cityDto);
         void EditTour(TourDto tourDto);
-        void AddUserToTour(int tourId, string UserName);
+        void AddUserToTour(int tourId, string userName);
+        void DeleteUserFromTour(int tourId, string userName);
         TourDto GetTour(int tourId);
         CityDto GetCity(int cityId);
         CountryDto GetСountry(int countryId);

@@ -15,7 +15,7 @@ using TourAgency.WEB.Models;
 
 namespace TourAgency.WEB.Controllers
 {
-    [System.Web.Http.Authorize]
+  [System.Web.Http.Authorize]
     public class RolesController : ApiController
     {
         private IUserService Service { get; }
@@ -35,7 +35,7 @@ namespace TourAgency.WEB.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, roles);
         }
 
-        [System.Web.Http.Authorize(Roles = "administrator, moderator")]
+       [System.Web.Http.Authorize(Roles = "administrator, moderator")]
         public HttpResponseMessage GetRole(string roleId)
         {
             RoleDto role;

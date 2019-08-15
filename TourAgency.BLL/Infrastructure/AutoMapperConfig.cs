@@ -34,8 +34,8 @@ namespace TourAgency.BLL.Infrastructure
                 .ConvertUsing(u => u.UserName);
 
                 config.CreateMap<User, UserDto>()
-                .ForMember(u => u.Role, u => u
-                .MapFrom(e => e.Roles.First()));
+                .ForMember(u => u.RoleId, u => u
+                .MapFrom(e => e.Roles.First().RoleId));
 
                 config.CreateMap<City, CityDto>()
                 .ForMember(c => c.CountryName, u => u

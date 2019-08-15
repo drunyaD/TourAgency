@@ -13,7 +13,7 @@ namespace TourAgency.WEB
         public static void Register(HttpConfiguration config)
         {
             // Конфигурация и службы веб-API
-            config.EnableCors(new EnableCorsAttribute("http://localhost:8080", "*", "*", "Set-Cookie") { SupportsCredentials = true });
+            config.EnableCors(new EnableCorsAttribute("http://localhost:8080", "*", "*", "Set-Cookie, Paging-Headers") { SupportsCredentials = true });
             // Маршруты веб-API
             config.MapHttpAttributeRoutes();
             config.Filters.Add(new ValidateModelAttribute());

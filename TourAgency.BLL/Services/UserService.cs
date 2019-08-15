@@ -50,7 +50,7 @@ namespace TourAgency.BLL.Services
                 CityId = userDto.CityId
             };
             Database.UserManager.Create(user, userDto.Password);
-            Database.UserManager.AddToRole(user.Id, userDto.Role);
+            Database.UserManager.AddToRole(user.Id, Database.RoleManager.FindById(userDto.RoleId).Name);
             return user.Id;
         }
 
@@ -125,6 +125,13 @@ namespace TourAgency.BLL.Services
         {
             return Mapper.Map<IEnumerable<User>, IEnumerable<UserDto>>(Database.UserManager.Users
                 .Where(u => u.Tours.Where(t => t.Id == tourId).Any()));
+        }
+
+        public UserDto GetUserByName(string userName)
+        {
+            var user = Database.UserManager.FindByName(userName);
+            if (user == null) throw new ArgumentException("no user exists with such id");
+            return Mapper.Map<User, UserDto>(user);
         }
     }
 }

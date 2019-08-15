@@ -13,6 +13,7 @@ namespace TourAgency.BLL.Interfaces
         string Create(UserDto userDto);
         ClaimsIdentity Authenticate(UserDto userDto);
         UserDto GetUser(string userId);
+        UserDto GetUserByName(string userName);
         IEnumerable<UserDto> GetUsers();
         IEnumerable<UserDto> GetUsersByTour(int tourId);
         void ChangeRole(string userId, RoleDto roleDto);

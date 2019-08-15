@@ -17,6 +17,6 @@ namespace TourAgency.BLL.DTO
         [Required]
         public string UserName { get; set; }
         public int? CityId { get; set; }
-        public string Role { get; set; }    
+        public string RoleId { get; set; }    
     }
 }

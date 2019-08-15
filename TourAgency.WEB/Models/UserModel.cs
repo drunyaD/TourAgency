@@ -11,5 +11,6 @@ namespace TourAgency.WEB.Models
         public string UserName { get; set; }
         public string Email { get; set; }
         public int? CityId { get; set; }
+        public string Role { get; set; }
     }
 }

@@ -314,6 +314,11 @@ namespace TourAgency.BLL.Services
 
         public IEnumerable<TourDto> GetToursByUser(string userName)
         {
+            var user = Database.UserManager.Users.Where(u => u.UserName == userName);
+            if (!user.Any())
+            {
+                throw new ArgumentException("no user with such id");
+            }
             return Mapper.Map<IEnumerable<Tour>,IEnumerable<TourDto>>(
                 Database.Tours.Find(t => t.Users.Where(u => u.UserName == userName).Any()));
         }
@@ -325,8 +330,29 @@ namespace TourAgency.BLL.Services
             {
                 throw new ArgumentException ("No tour with such id exists");
             }
-            var userTask = Database.UserManager.FindByNameAsync(userName);
-            tour.Users.Add(userTask.Result);
+
+            if (tour.Users.Any(u => u.UserName == userName))
+            {
+                throw new ArgumentException("This user has already registered for this tour");
+            }
+            //  var user = await Database.UserManager.FindByNameAsync(userName);
+            var user =  Database.UserManager.Users.Where(u => u.UserName == userName).First();
+
+            tour.Users.Add(user);
+            Database.Tours.Update(tour);
+            Database.Save();
+        }
+
+        public  void DeleteUserFromTour(int tourId, string userName)
+        {
+            var tour = Database.Tours.Get(tourId);
+            if (tour == null)
+            {
+                throw new ArgumentException("No tour with such id exists");
+            }
+            //  var user = await Database.UserManager.FindByNameAsync(userName);
+            var user = Database.UserManager.Users.Where(u => u.UserName == userName).First();
+            tour.Users.Remove(user);
             Database.Tours.Update(tour);
             Database.Save();
         }

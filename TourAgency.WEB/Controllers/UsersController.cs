@@ -15,7 +15,6 @@ using TourAgency.WEB.Models;
 
 namespace TourAgency.WEB.Controllers
 {
-    [System.Web.Http.Authorize]
     public class UsersController : ApiController
     {
         private IUserService Service { get; }
@@ -46,7 +45,15 @@ namespace TourAgency.WEB.Controllers
             {
                 IsPersistent = true
             }, claim);
-            return Request.CreateResponse(HttpStatusCode.OK);
+            var user = Service.GetUserByName(model.UserName);
+            return Request.CreateResponse(HttpStatusCode.OK, new UserModel
+            {
+                Id = user.Id,
+                Email = user.Email,
+                UserName = user.UserName,
+                CityId = user.CityId,
+                Role = Service.GetRole(user.RoleId).Name
+            });
 
         }
 
@@ -69,7 +76,7 @@ namespace TourAgency.WEB.Controllers
                 UserName = registerModel.UserName,
                 Email = registerModel.Email,
                 Password = registerModel.Password,
-                Role = "user",
+                RoleId = "11737468-693f-4521-84ab-efae71d721e7",
                 CityId = registerModel.CityId
 
             };
@@ -111,16 +118,16 @@ namespace TourAgency.WEB.Controllers
             var users = mapper.Map<IEnumerable<UserDto>, List<UserModel>>(userDtos);
             return Request.CreateResponse(HttpStatusCode.OK, users);
         }
-
-        [System.Web.Http.Authorize(Roles = "administrator, moderator")]
-        public HttpResponseMessage GetUsersByTourId(int tourId)
+        [System.Web.Http.AllowAnonymous]
+        public HttpResponseMessage GetUsersByTourId([FromUri]int tourId)
         {
             var userDtos = Service.GetUsersByTour(tourId);
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<UserDto, UserModel>()).CreateMapper();
             var users = mapper.Map<IEnumerable<UserDto>, List<UserModel>>(userDtos);
             return Request.CreateResponse(HttpStatusCode.OK, users);
         }
-        [System.Web.Http.Authorize(Roles = "administrator, moderator")]
+
+        [System.Web.Http.Authorize]
         [System.Web.Http.Route("api/users/{userId}")]
         public HttpResponseMessage GetUser(string userId)
         {
@@ -142,7 +149,8 @@ namespace TourAgency.WEB.Controllers
                     Id = user.Id,
                     Email = user.Email,
                     UserName = user.UserName,
-                    CityId = user.CityId
+                    CityId = user.CityId,
+                    Role = Service.GetRole(user.RoleId).Name
                 });
             }
             else
