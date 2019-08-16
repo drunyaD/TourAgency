@@ -76,7 +76,7 @@ namespace TourAgency.WEB.Controllers
                 UserName = registerModel.UserName,
                 Email = registerModel.Email,
                 Password = registerModel.Password,
-                RoleId = "11737468-693f-4521-84ab-efae71d721e7",
+                RoleId = "8df3dd85-4249-49ff-ab02-4d13de9e1a1d",
                 CityId = registerModel.CityId
 
             };
