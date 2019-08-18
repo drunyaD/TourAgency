@@ -2,10 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TourAgency.BLL.DTO;
 using TourAgency.BLL.Interfaces;
 using TourAgency.BLL.Models;
@@ -18,10 +15,12 @@ namespace TourAgency.BLL.Services
     {
         private bool _disposed = false;
         private IUnitOfWork Database { get; }
+
         public TourService(IUnitOfWork uow)
         {
             Database = uow;
         }
+
         public int AddCity(CityDto cityDto)
         {
             var countries = Database.Countries.Find(country => country.Name == cityDto.CountryName);
@@ -29,10 +28,17 @@ namespace TourAgency.BLL.Services
             {
                 throw new ValidationException("No country with such name");
             }
+            var cities = Database.Cities.Find(c => c.Name == cityDto.Name);
+            if (cities.Any())
+            {
+                throw new ValidationException("Such city already exists");
+            }
+
             City city = new City
             {
                 Name = cityDto.Name,
-                CountryId = countries.First().Id,
+                CountryId = countries.First()
+                    .Id,
                 Country = countries.First()
             };
             Database.Cities.Create(city);
@@ -49,6 +55,7 @@ namespace TourAgency.BLL.Services
             {
                 throw new ValidationException("Such country already exists");
             }
+
             Country country = new Country
             {
                 Name = countryDto.Name
@@ -57,6 +64,7 @@ namespace TourAgency.BLL.Services
             Database.Save();
             return country.Id;
         }
+
         public int AddTour(TourDto tourDto)
         {
 
@@ -71,12 +79,18 @@ namespace TourAgency.BLL.Services
             };
             foreach (var picture in tourDto.Images)
             {
-                var image = new Image { Picture = picture, Tour = tour };
+                var image = new Image
+                {
+                    Picture = picture,
+                    Tour = tour
+                };
                 Database.Images.Create(image);
                 tour.Images.Add(image);
             }
 
-            for (int i = 0; i < tourDto.Cities.Count; i++)
+            for (int i = 0;
+                i < tourDto.Cities.Count;
+                i++)
             {
                 var cityDto = tourDto.Cities[i];
                 var city = Database.Cities.Get(cityDto.Id);
@@ -84,6 +98,7 @@ namespace TourAgency.BLL.Services
                 {
                     throw new ValidationException("No such city exists");
                 }
+
                 Node node = new Node
                 {
                     OrderNumber = i,
@@ -95,6 +110,7 @@ namespace TourAgency.BLL.Services
                 tour.Nodes.Add(node);
 
             }
+
             Database.Tours.Create(tour);
             Database.Save();
             return tour.Id;
@@ -107,6 +123,7 @@ namespace TourAgency.BLL.Services
             {
                 throw new ArgumentException("No city with such id exists");
             }
+
             Database.Cities.Delete(city);
             Database.Save();
         }
@@ -118,6 +135,7 @@ namespace TourAgency.BLL.Services
             {
                 throw new ArgumentException("No country with such id exists");
             }
+
             Database.Countries.Delete(country);
             Database.Save();
         }
@@ -129,6 +147,7 @@ namespace TourAgency.BLL.Services
             {
                 throw new ArgumentException("No tour with such id exists");
             }
+
             Database.Tours.Delete(tour);
             Database.Save();
         }
@@ -142,10 +161,12 @@ namespace TourAgency.BLL.Services
             {
                 throw new ValidationException("No city with such id");
             }
+
             if (countries == null || !countries.Any())
             {
                 throw new ValidationException("No country with such name");
             }
+
             var country = countries.FirstOrDefault();
             city.Name = cityDto.Name;
             city.Country = country;
@@ -185,12 +206,18 @@ namespace TourAgency.BLL.Services
 
             foreach (var picture in tourDto.Images)
             {
-                var image = new Image { Picture = picture, Tour = tour };
+                var image = new Image
+                {
+                    Picture = picture,
+                    Tour = tour
+                };
                 Database.Images.Create(image);
                 tour.Images.Add(image);
             }
 
-            for (int i = 0; i < tourDto.Cities.Count; i++)
+            for (int i = 0;
+                i < tourDto.Cities.Count;
+                i++)
             {
                 var cityDto = tourDto.Cities[i];
                 var city = Database.Cities.Get(cityDto.Id);
@@ -198,6 +225,7 @@ namespace TourAgency.BLL.Services
                 {
                     throw new ValidationException("No such city exists");
                 }
+
                 Node node = new Node
                 {
                     OrderNumber = i,
@@ -208,6 +236,7 @@ namespace TourAgency.BLL.Services
                 Database.Nodes.Create(node);
                 tour.Nodes.Add(node);
             }
+
             Database.Tours.Update(tour);
             Database.Save();
         }
@@ -224,6 +253,7 @@ namespace TourAgency.BLL.Services
             {
                 throw new ArgumentException("No city with such id");
             }
+
             return Mapper.Map<City, CityDto>(city);
         }
 
@@ -239,6 +269,7 @@ namespace TourAgency.BLL.Services
             {
                 throw new ArgumentException("No tour with such id");
             }
+
             return Mapper.Map<Tour, TourDto>(tour);
         }
 
@@ -261,12 +292,13 @@ namespace TourAgency.BLL.Services
             if (searchModel.NotFullOnly.HasValue && searchModel.NotFullOnly == true)
                 tours = tours.Where(t => t.Users.Count < t.MaxCapacity);
             if (!string.IsNullOrEmpty(searchModel.SearchString))
-                tours = tours.Where(t => t.Name.IndexOf(searchModel.SearchString) != -1
-                || t.Description.IndexOf(searchModel.SearchString) != -1);
+                tours = tours.Where(t =>
+                    t.Name.IndexOf(searchModel.SearchString) != -1 ||
+                    t.Description.IndexOf(searchModel.SearchString) != -1);
             if (searchModel.CountryId.HasValue)
-                tours = tours.Where(t => t.Nodes.Where(n => n.City.Country.Id == searchModel.CountryId).Any());
+                tours = tours.Where(t => t.Nodes.Any(n => n.City.Country.Id == searchModel.CountryId));
 
-            if(searchModel.SortState != null)
+            if (searchModel.SortState != null)
             {
                 if (searchModel.SortState == SortState.NameAsc)
                     tours = tours.OrderBy(o => o.Name);
@@ -277,11 +309,13 @@ namespace TourAgency.BLL.Services
                 if (searchModel.SortState == SortState.PriceDesc)
                     tours = tours.OrderByDescending(o => o.Price);
                 if (searchModel.SortState == SortState.DateAsc)
-                    tours = tours.OrderBy(o => o.StartDate).ThenBy(o => o.FinishDate);
+                    tours = tours.OrderBy(o => o.StartDate)
+                        .ThenBy(o => o.FinishDate);
                 if (searchModel.SortState == SortState.DateDesc)
                     tours = tours.OrderByDescending(o => o.StartDate)
-                                 .ThenByDescending(o => o.FinishDate);
+                        .ThenByDescending(o => o.FinishDate);
             }
+
             return Mapper.Map<IEnumerable<Tour>, IEnumerable<TourDto>>(tours);
         }
 
@@ -292,12 +326,14 @@ namespace TourAgency.BLL.Services
             {
                 throw new ArgumentException("No country with such id exists");
             }
+
             return Mapper.Map<Country, CountryDto>(country);
         }
 
         public virtual void Dispose(bool disposing)
         {
-            if (_disposed) return;
+            if (_disposed)
+                return;
             if (disposing)
             {
                 Database.Dispose();
@@ -319,39 +355,41 @@ namespace TourAgency.BLL.Services
             {
                 throw new ArgumentException("no user with such id");
             }
-            return Mapper.Map<IEnumerable<Tour>,IEnumerable<TourDto>>(
-                Database.Tours.Find(t => t.Users.Where(u => u.UserName == userName).Any()));
+
+            return Mapper.Map<IEnumerable<Tour>, IEnumerable<TourDto>>(
+                Database.Tours.Find(t => t.Users.Any(u => u.UserName == userName)));
         }
 
-        public void AddUserToTour(int tourId, string userName)
-        {
-            var tour = Database.Tours.Get(tourId);
-            if (tour == null)
-            {
-                throw new ArgumentException ("No tour with such id exists");
-            }
-
-            if (tour.Users.Any(u => u.UserName == userName))
-            {
-                throw new ArgumentException("This user has already registered for this tour");
-            }
-            //  var user = await Database.UserManager.FindByNameAsync(userName);
-            var user =  Database.UserManager.Users.Where(u => u.UserName == userName).First();
-
-            tour.Users.Add(user);
-            Database.Tours.Update(tour);
-            Database.Save();
-        }
-
-        public  void DeleteUserFromTour(int tourId, string userName)
+        public void AddUserToTour(int tourId,
+            string userName)
         {
             var tour = Database.Tours.Get(tourId);
             if (tour == null)
             {
                 throw new ArgumentException("No tour with such id exists");
             }
-            //  var user = await Database.UserManager.FindByNameAsync(userName);
-            var user = Database.UserManager.Users.Where(u => u.UserName == userName).First();
+
+            if (tour.Users.Any(u => u.UserName == userName))
+            {
+                throw new ArgumentException("This user has already registered for this tour");
+            }
+
+            var user = Database.UserManager.Users.First(u => u.UserName == userName);
+
+            tour.Users.Add(user);
+            Database.Tours.Update(tour);
+            Database.Save();
+        }
+
+        public void DeleteUserFromTour(int tourId,
+            string userName)
+        {
+            var tour = Database.Tours.Get(tourId);
+            if (tour == null)
+            {
+                throw new ArgumentException("No tour with such id exists");
+            }
+            var user = Database.UserManager.Users.First(u => u.UserName == userName);
             tour.Users.Remove(user);
             Database.Tours.Update(tour);
             Database.Save();

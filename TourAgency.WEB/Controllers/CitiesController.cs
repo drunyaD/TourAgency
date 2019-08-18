@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -21,6 +20,7 @@ namespace TourAgency.WEB.Controllers
         {
             Service = service;
         }
+
         [AllowAnonymous]
         [Route("api/cities/{cityId}")]
         public HttpResponseMessage GetCity(int cityId)
@@ -28,19 +28,22 @@ namespace TourAgency.WEB.Controllers
             try
             {
                 var cityDto = Service.GetCity(cityId);
-                return Request.CreateResponse(HttpStatusCode.OK, new CityModel
-                {
-                    Id = cityId,
-                    Name = cityDto.Name,
-                    CountryName = cityDto.CountryName
-                });
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    new CityModel
+                    {
+                        Id = cityId,
+                        Name = cityDto.Name,
+                        CountryName = cityDto.CountryName
+                    });
             }
             catch (ArgumentException e)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, e.Message);
+                return Request.CreateResponse(HttpStatusCode.NotFound,
+                    e.Message);
             }
 
         }
+
         [AllowAnonymous]
         public HttpResponseMessage GetCities()
         {
@@ -48,38 +51,45 @@ namespace TourAgency.WEB.Controllers
             var cityDtos = Service.GetCities();
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<CityDto, CityModel>()).CreateMapper();
             var cities = mapper.Map<IEnumerable<CityDto>, List<CityModel>>(cityDtos);
-            return Request.CreateResponse(HttpStatusCode.OK, cities);
+            return Request.CreateResponse(HttpStatusCode.OK,
+                cities);
 
         }
+
         [Authorize(Roles = "administrator, moderator")]
         [HttpPost]
-        public HttpResponseMessage CreateCity([FromBody]CityModel cityModel)
+        public HttpResponseMessage CreateCity([FromBody] CityModel cityModel)
         {
             int cityId;
-            try {
+            try
+            {
                 cityId = Service.AddCity(new CityDto
                 {
                     Name = cityModel.Name,
                     CountryName = cityModel.CountryName
                 });
             }
-            catch (ValidationException e) {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, e.Message);
-            }
-            
-            var response = Request.CreateResponse(HttpStatusCode.Created, new CityModel
+            catch (ValidationException e)
             {
-                Id = cityId,
-                Name = cityModel.Name,
-                CountryName = cityModel.CountryName
-            });
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                    e.Message);
+            }
+
+            var response = Request.CreateResponse(HttpStatusCode.Created,
+                new CityModel
+                {
+                    Id = cityId,
+                    Name = cityModel.Name,
+                    CountryName = cityModel.CountryName
+                });
             return response;
         }
+
         [Authorize(Roles = "administrator, moderator")]
         [HttpPut]
         [Route("api/cities/{cityId}")]
         public HttpResponseMessage ChangeCity([FromUri] int cityId,
-                                                  [FromBody]CityModel cityModel)
+            [FromBody] CityModel cityModel)
         {
             try
             {
@@ -92,12 +102,14 @@ namespace TourAgency.WEB.Controllers
             }
             catch (ValidationException e)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, e.Message);
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                    e.Message);
             }
-            
+
             return Request.CreateResponse(HttpStatusCode.OK);
 
         }
+
         [HttpDelete]
         [Route("api/cities/{cityId}")]
         [Authorize(Roles = "administrator, moderator")]
@@ -110,14 +122,16 @@ namespace TourAgency.WEB.Controllers
             }
             catch (ArgumentException e)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, e.Message);
+                return Request.CreateResponse(HttpStatusCode.NotFound,
+                    e.Message);
             }
         }
-       
+
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing) Service.Dispose();
+            if (disposing)
+                Service.Dispose();
             base.Dispose(disposing);
         }
     }

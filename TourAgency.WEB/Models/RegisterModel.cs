@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace TourAgency.WEB.Models
 {
@@ -24,6 +20,7 @@ namespace TourAgency.WEB.Models
         [MinLength(3)]
         [MaxLength(60)]
         public string UserName { get; set; }
+
         public int? CityId { get; set; }
     }
 }

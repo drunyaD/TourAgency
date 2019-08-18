@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -20,6 +19,7 @@ namespace TourAgency.WEB.Controllers
         {
             Service = service;
         }
+
         [AllowAnonymous]
         [Route("api/countries/{countryId}")]
         public HttpResponseMessage GetCountry(int countryId)
@@ -27,18 +27,21 @@ namespace TourAgency.WEB.Controllers
             try
             {
                 var countryDto = Service.GetСountry(countryId);
-                return Request.CreateResponse(HttpStatusCode.OK, new CountryModel
-                {
-                    Id = countryId,
-                    Name = countryDto.Name
-                });
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    new CountryModel
+                    {
+                        Id = countryId,
+                        Name = countryDto.Name
+                    });
             }
             catch (ArgumentException e)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, e.Message);
+                return Request.CreateResponse(HttpStatusCode.NotFound,
+                    e.Message);
             }
 
         }
+
         [AllowAnonymous]
         public HttpResponseMessage GetCountries()
         {
@@ -46,12 +49,14 @@ namespace TourAgency.WEB.Controllers
             var countryDtos = Service.GetCountries();
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<CountryDto, CountryModel>()).CreateMapper();
             var countries = mapper.Map<IEnumerable<CountryDto>, List<CountryModel>>(countryDtos);
-            return Request.CreateResponse(HttpStatusCode.OK, countries);
+            return Request.CreateResponse(HttpStatusCode.OK,
+                countries);
 
         }
+
         [Authorize(Roles = "administrator, moderator")]
         [HttpPost]
-        public HttpResponseMessage CreateCountry([FromBody]CountryModel countryModel)
+        public HttpResponseMessage CreateCountry([FromBody] CountryModel countryModel)
         {
             int countryId;
             try
@@ -63,17 +68,19 @@ namespace TourAgency.WEB.Controllers
             }
             catch (ValidationException e)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, e.Message);
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                    e.Message);
             }
 
-            var response = Request.CreateResponse(HttpStatusCode.Created, new CountryModel
-            {
-                Id = countryId,
-                Name = countryModel.Name,
-            });
+            var response = Request.CreateResponse(HttpStatusCode.Created,
+                new CountryModel
+                {
+                    Id = countryId,
+                    Name = countryModel.Name,
+                });
             return response;
         }
-        
+
         [HttpDelete]
         [Route("api/countries/{countryId}")]
         [Authorize(Roles = "administrator, moderator")]
@@ -86,13 +93,15 @@ namespace TourAgency.WEB.Controllers
             }
             catch (ArgumentException e)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, e.Message);
+                return Request.CreateResponse(HttpStatusCode.NotFound,
+                    e.Message);
             }
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing) Service.Dispose();
+            if (disposing)
+                Service.Dispose();
             base.Dispose(disposing);
         }
     }
