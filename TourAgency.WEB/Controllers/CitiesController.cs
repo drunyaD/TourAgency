@@ -96,7 +96,7 @@ namespace TourAgency.WEB.Controllers
             }
             
             return Request.CreateResponse(HttpStatusCode.OK);
-
+             
         }
         [HttpDelete]
         [Route("api/cities/{cityId}")]
@@ -113,8 +113,7 @@ namespace TourAgency.WEB.Controllers
                 return Request.CreateResponse(HttpStatusCode.NotFound, e.Message);
             }
         }
-       
-
+    
         protected override void Dispose(bool disposing)
         {
             if (disposing) Service.Dispose();

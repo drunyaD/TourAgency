@@ -19,7 +19,7 @@ namespace TourAgency.BLL.Infrastructure
 
                 config.CreateMap<Role, RoleDto>();
 
-                config.CreateMap<Image, byte[]>()
+                config.CreateMap<Image, string>()
                 .ConstructUsing(i => i.Picture);
 
                 config.CreateMap<Node, CityDto>()
@@ -49,7 +49,7 @@ namespace TourAgency.BLL.Infrastructure
                 .ForMember(t => t.Cities, t => t
                 .MapFrom(e => Mapper.Map<IEnumerable<Node>, IEnumerable<CityDto>>(e.Nodes
                 .OrderBy(n => n.OrderNumber))))
-                .ForMember(t => t.Images, t => t.MapFrom(e => Mapper.Map<IEnumerable<Image>, IEnumerable<byte[]>>(e.Images)));
+                .ForMember(t => t.Images, t => t.MapFrom(e => Mapper.Map<IEnumerable<Image>, IEnumerable<string>>(e.Images)));
             });
 #pragma warning restore CS0618 
         }

@@ -29,11 +29,11 @@ namespace TourAgency.WEB.Models
         [Required]
         [Range(1, 1000)]
         public int MaxCapacity { get; set; }
-        public ICollection<byte[]> Images { get; set; }
+        public ICollection<string> Images { get; set; }
         public IList<CityModel> Cities { get; set; }
         public TourModel()
         {
-            Images = new HashSet<byte[]>();
+            Images = new HashSet<string>();
             Cities = new List<CityModel>();
         }
     }

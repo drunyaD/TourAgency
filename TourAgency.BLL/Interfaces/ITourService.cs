@@ -27,6 +27,6 @@ namespace TourAgency.BLL.Interfaces
         IEnumerable<TourDto> GetTours();
         IEnumerable<TourDto> GetToursByOptions(TourSearchModel searchModel);
         IEnumerable<TourDto> GetToursByUser(string userName);
-
+        void CreateImages(IEnumerable<ImageDto> imageDtos);
     }
 }

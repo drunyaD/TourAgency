@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.TeamFoundation.WorkItemTracking.Common;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using TourAgency.BLL.DTO;
@@ -113,8 +116,19 @@ namespace TourAgency.WEB.Controllers
 
         [Authorize(Roles = "administrator, moderator")]
         [HttpPost]
-        public HttpResponseMessage CreateTour([FromBody]TourModel tourModel)
+        public async Task<HttpResponseMessage> CreateTour()
         {
+            if (!Request.Content.IsMimeMultipartContent())
+            {
+                return Request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
+            }
+
+            var filesReadToProvider =  await Request.Content.ReadAsMultipartAsync();
+
+            var json = filesReadToProvider.Contents[0].ReadAsStringAsync().Result;
+            TourModel tourModel = JsonConvert.DeserializeObject<TourModel>(json);
+           
+                
             int tourId;
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<CityModel, CityDto>()).CreateMapper();
             var cities = mapper.Map<IEnumerable<CityModel>, List<CityDto>>(tourModel.Cities);
@@ -127,7 +141,6 @@ namespace TourAgency.WEB.Controllers
                     Price = tourModel.Price,
                     StartDate = tourModel.StartDate,
                     FinishDate = tourModel.FinishDate,
-                    Images = tourModel.Images,
                     MaxCapacity = tourModel.MaxCapacity,
                     Cities = cities
                 });
@@ -137,15 +150,35 @@ namespace TourAgency.WEB.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest, e.Message);
             }
             tourModel.Id = tourId;
+
+            List<ImageDto> imageDtos = new List<ImageDto>();
+            foreach (var pict in filesReadToProvider.Contents.Skip(1))
+            {
+                imageDtos.Add(new ImageDto
+                {
+                    TourId = tourModel.Id,
+                    File = pict.ReadAsStreamAsync().Result,
+                    FileName = pict.Headers.ContentDisposition.FileName.Replace("\"", "")
+                });
+            }
+            Service.CreateImages(imageDtos);
             var response = Request.CreateResponse(HttpStatusCode.Created, tourModel);
             return response;
         }
         [Authorize(Roles = "administrator, moderator")]
         [HttpPut]
         [Route("api/tours/{tourId}")]
-        public HttpResponseMessage ChangeTour([FromUri]int tourId,
-                                                  [FromBody]TourModel tourModel)
+        public async Task<HttpResponseMessage> ChangeTour([FromUri]int tourId)
         {
+            if (!Request.Content.IsMimeMultipartContent())
+            {
+                return Request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
+            }
+
+            var filesReadToProvider = await Request.Content.ReadAsMultipartAsync();
+
+            var json = filesReadToProvider.Contents[0].ReadAsStringAsync().Result;
+            TourModel tourModel = JsonConvert.DeserializeObject<TourModel>(json);
 
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<CityModel, CityDto>()).CreateMapper();
             var cities = mapper.Map<IEnumerable<CityModel>, List<CityDto>>(tourModel.Cities);
@@ -159,7 +192,6 @@ namespace TourAgency.WEB.Controllers
                     Price = tourModel.Price,
                     StartDate = tourModel.StartDate,
                     FinishDate = tourModel.FinishDate,
-                    Images = tourModel.Images,
                     MaxCapacity = tourModel.MaxCapacity,
                     Cities = cities,
                 });
@@ -168,7 +200,17 @@ namespace TourAgency.WEB.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, e.Message);
             }
-
+            List<ImageDto> imageDtos = new List<ImageDto>();
+            foreach (var pict in filesReadToProvider.Contents.Skip(1))
+            {
+                imageDtos.Add(new ImageDto
+                {
+                    TourId = tourModel.Id,
+                    File = pict.ReadAsStreamAsync().Result,
+                    FileName = pict.Headers.ContentDisposition.FileName.Replace("\"", "")
+                });
+            }
+            Service.CreateImages(imageDtos);
             return Request.CreateResponse(HttpStatusCode.OK);
 
         }

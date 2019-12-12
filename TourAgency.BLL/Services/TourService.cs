@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -316,6 +317,39 @@ namespace TourAgency.BLL.Services
             tour.Users.Add(userTask.Result);
             Database.Tours.Update(tour);
             Database.Save();
+        }
+
+        public void CreateImages(IEnumerable<ImageDto> imageDtos)
+        {
+            var tour = Database.Tours.Get(imageDtos.First().TourId);
+            var existingImgs = Database.Images.Find(i => i.TourId == tour.Id);
+            foreach (var img in existingImgs)
+            {
+                Database.Images.Delete(img);
+            }
+            for (int i = 0; i < imageDtos.Count(); i++)
+            {
+                var pict = imageDtos.ElementAt(i);
+                string link = $"{pict.FileName}";
+
+                using (pict.File)
+                {
+                    using (FileStream filestream = File.Open(
+                                 "D:\\Images\\" + link, FileMode.OpenOrCreate))
+                    {
+                        pict.File.CopyTo(filestream);
+                        filestream.Flush();
+                    }
+                }
+
+                Database.Images.Create(new Image
+                {
+                    Picture = "D:\\Images\\" + link,
+                    TourId = pict.TourId,
+                    Tour = tour
+                });
+                Database.Save();
+            }
         }
     }
 }

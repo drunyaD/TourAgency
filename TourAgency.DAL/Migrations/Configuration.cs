@@ -1,51 +1,28 @@
-﻿using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TourAgency.DAL.Entities;
-using TourAgency.DAL.Identity;
-
-namespace TourAgency.DAL.EF
+﻿namespace TourAgency.DAL.Migrations
 {
-    public class AgencyContext : IdentityDbContext<User>
+    using Microsoft.AspNet.Identity;
+    using Microsoft.AspNet.Identity.EntityFramework;
+    using System;
+    using System.Data.Entity;
+    using System.Data.Entity.Migrations;
+    using System.Linq;
+    using TourAgency.DAL.Entities;
+    using TourAgency.DAL.Identity;
+
+    internal sealed class Configuration : DbMigrationsConfiguration<TourAgency.DAL.EF.AgencyContext>
     {
+        public Configuration()
+        {
+            AutomaticMigrationsEnabled = false;
+        }
 
-        public DbSet<City> Cities {get; set;}
-        public DbSet<Country> Countries { get; set; }
-        public DbSet<Node> Nodes { get; set; }
-        public DbSet<Image> Images { get; set; }
-        public DbSet<Tour> Tours { get; set; }
-        public AgencyContext(string connectionString) : base(connectionString)
+        protected override void Seed(TourAgency.DAL.EF.AgencyContext db)
         {
-            InitializeDatabase();
-        }
-        public AgencyContext():base()
-        {
-            InitializeDatabase();
-        }
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        {
+            //  This method will be called after migrating to the latest version.
 
-            base.OnModelCreating(modelBuilder);
-        }
-        protected virtual void InitializeDatabase()
-        {
-            if (!Database.Exists())
-            {
-                Database.Initialize(true);
-               // new DatabaseInitializer().Seed(this);
-            }
-        }
-    }
+            //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
+            //  to avoid creating duplicate seed data.
 
-    public class DatabaseInitializer : DropCreateDatabaseIfModelChanges<AgencyContext>
-    {
-        public new void Seed(AgencyContext db)
-        {
             var roleStore = new RoleStore<Role>(db);
             var roleManager = new AppRoleManager(roleStore);
             roleManager.Create(new Role() { Name = "user" });
@@ -54,6 +31,7 @@ namespace TourAgency.DAL.EF
 
             var userStore = new UserStore<User>(db);
             var userManager = new AppUserManager(userStore);
+            
             User admin = new User
             {
                 Email = "admin@mail.ru",
@@ -169,7 +147,7 @@ namespace TourAgency.DAL.EF
                 Name = "Яссы",
                 Country = db.Countries
                      .Where(c => c.Name == "Румыния").First()
-            }); 
+            });
             db.SaveChanges();
             base.Seed(db);
         }
