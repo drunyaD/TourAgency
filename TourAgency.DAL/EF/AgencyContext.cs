@@ -25,7 +25,9 @@ namespace TourAgency.DAL.EF
             InitializeDatabase();
         }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        { }
+        {
+            base.OnModelCreating(modelBuilder);
+        }
 
         protected void InitializeDatabase()
         {
