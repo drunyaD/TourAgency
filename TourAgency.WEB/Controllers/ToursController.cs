@@ -26,6 +26,7 @@ namespace TourAgency.WEB.Controllers
         {
             Service = service;
         }
+
         [AllowAnonymous]
         [Route("api/tours/{tourId}")]
         public HttpResponseMessage GetTour(int tourId)
@@ -37,28 +38,31 @@ namespace TourAgency.WEB.Controllers
             }
             catch (ArgumentException e)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, e.Message);
+                return Request.CreateResponse(HttpStatusCode.NotFound,
+                    e.Message);
             }
+
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<CityDto, CityModel>()).CreateMapper();
             var cities = mapper.Map<IEnumerable<CityDto>, List<CityModel>>(tourDto.Cities);
 
-            return Request.CreateResponse(HttpStatusCode.OK, new TourModel
-            {
-                Id = tourId,
-                Name = tourDto.Name,
-                Description = tourDto.Description,
-                Price = tourDto.Price,
-                StartDate = tourDto.StartDate,
-                FinishDate = tourDto.FinishDate,
-                MaxCapacity = tourDto.MaxCapacity,
-                Cities = cities,
-                Images = tourDto.Images,
-            });
+            return Request.CreateResponse(HttpStatusCode.OK,
+                new TourModel
+                {
+                    Id = tourId,
+                    Name = tourDto.Name,
+                    Description = tourDto.Description,
+                    Price = tourDto.Price,
+                    StartDate = tourDto.StartDate,
+                    FinishDate = tourDto.FinishDate,
+                    MaxCapacity = tourDto.MaxCapacity,
+                    Cities = cities,
+                    Images = tourDto.Images,
+                });
         }
-        
+
 
         [AllowAnonymous]
-        public HttpResponseMessage GetTours([FromUri] TourSearchModel searchModel, 
+        public HttpResponseMessage GetTours([FromUri] TourSearchModel searchModel,
             [FromUri] PagingModel pagingModel)
         {
             var tourDtos = Service.GetToursByOptions(searchModel);
@@ -69,43 +73,57 @@ namespace TourAgency.WEB.Controllers
             }).CreateMapper();
             var tours = mapper.Map<IEnumerable<TourDto>, List<TourModel>>(tourDtos);
 
-            int TotalCount = tours.Count();
-            int CurrentPage = pagingModel.PageNumber;
-            int PageSize = pagingModel.PageSize;
-            int TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
-            tours = tours.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
-            var previousPage = CurrentPage > 1 ? "Yes" : "No";
-            var nextPage = CurrentPage < TotalPages ? "Yes" : "No";
+            int totalCount = tours.Count();
+            int currentPage = pagingModel.PageNumber;
+            int pageSize = pagingModel.PageSize;
+            int totalPages = (int) Math.Ceiling(totalCount / (double) pageSize);
+            tours = tours.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            var previousPage = currentPage > 1 ? "Yes" : "No";
+            var nextPage = currentPage < totalPages ? "Yes" : "No";
 
             var paginationMetadata = new
             {
-                totalCount = TotalCount,
-                pageSize = PageSize,
-                currentPage = CurrentPage,
-                totalPages = TotalPages,
+                totalCount,
+                pageSize,
+                currentPage,
+                totalPages,
                 previousPage,
                 nextPage
             };
 
-            HttpContext.Current.Response.Headers.Add("Paging-Headers", JsonConvert.SerializeObject(paginationMetadata));
-            return Request.CreateResponse(HttpStatusCode.OK, tours);
+            HttpContext.Current.Response.Headers.Add("Paging-Headers",
+                JsonConvert.SerializeObject(paginationMetadata));
+            return Request.CreateResponse(HttpStatusCode.OK,
+                tours);
         }
 
-        [Authorize(Roles = "administrator, moderator")]
-        public HttpResponseMessage GetToursByUserId(string userName)
+        [Authorize]
+        public HttpResponseMessage GetToursByUserName(string userName)
         {
             var principal = HttpContext.Current.User;
-            if (userName == principal.Identity.Name || principal.IsInRole("administrator")
-                || principal.IsInRole("moderator"))
+            if (userName == principal.Identity.Name ||
+                principal.IsInRole("administrator") ||
+                principal.IsInRole("moderator"))
             {
-                var tourDtos = Service.GetToursByUser(userName);
+                IEnumerable<TourDto> tourDtos;
+                try
+                {
+                    tourDtos = Service.GetToursByUser(userName);
+                }
+                catch (ArgumentException e)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound,
+                        e.Message);
+                }
+
                 var mapper = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<CityDto, CityModel>();
                     cfg.CreateMap<TourDto, TourModel>();
                 }).CreateMapper();
                 var tours = mapper.Map<IEnumerable<TourDto>, List<TourModel>>(tourDtos);
-                return Request.CreateResponse(HttpStatusCode.OK, tours);
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    tours);
             }
             else
             {
@@ -117,6 +135,7 @@ namespace TourAgency.WEB.Controllers
         [Authorize(Roles = "administrator, moderator")]
         [HttpPost]
         public async Task<HttpResponseMessage> CreateTour()
+
         {
             if (!Request.Content.IsMimeMultipartContent())
             {
@@ -147,8 +166,10 @@ namespace TourAgency.WEB.Controllers
             }
             catch (ValidationException e)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, e.Message);
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                    e.Message);
             }
+
             tourModel.Id = tourId;
 
             List<ImageDto> imageDtos = new List<ImageDto>();
@@ -165,10 +186,13 @@ namespace TourAgency.WEB.Controllers
             var response = Request.CreateResponse(HttpStatusCode.Created, tourModel);
             return response;
         }
+
         [Authorize(Roles = "administrator, moderator")]
         [HttpPut]
         [Route("api/tours/{tourId}")]
+
         public async Task<HttpResponseMessage> ChangeTour([FromUri]int tourId)
+
         {
             if (!Request.Content.IsMimeMultipartContent())
             {
@@ -198,7 +222,8 @@ namespace TourAgency.WEB.Controllers
             }
             catch (ValidationException e)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, e.Message);
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                    e.Message);
             }
             List<ImageDto> imageDtos = new List<ImageDto>();
             foreach (var pict in filesReadToProvider.Contents.Skip(1))
@@ -215,23 +240,42 @@ namespace TourAgency.WEB.Controllers
 
         }
 
-        
-        [Authorize(Roles = "user")]
+
+
         [HttpPost]
         [Route("api/tours/{tourId}/users")]
-        public HttpResponseMessage AddUserToTour([FromUri]int tourId)
+        public HttpResponseMessage AddUserToTour([FromUri] int tourId)
         {
             try
             {
-                Service.AddUserToTour(tourId, HttpContext.Current.User.Identity.Name);
+                Service.AddUserToTour(tourId,
+                    HttpContext.Current.User.Identity.Name);
             }
             catch (ArgumentException e)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, e.Message);
+                return Request.CreateResponse(HttpStatusCode.NotFound,
+                    e.Message);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
+        }
 
+        [Authorize(Roles = "user")]
+        [Route("api/tours/{tourId}/users")]
+        public HttpResponseMessage DeleteUserFromTour([FromUri] int tourId)
+        {
+            try
+            {
+                Service.DeleteUserFromTour(tourId,
+                    HttpContext.Current.User.Identity.Name);
+            }
+            catch (ArgumentException e)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound,
+                    e.Message);
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [HttpDelete]
@@ -245,15 +289,18 @@ namespace TourAgency.WEB.Controllers
             }
             catch (ArgumentException e)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, e.Message);
+                return Request.CreateResponse(HttpStatusCode.NotFound,
+                    e.Message);
             }
+
             return Request.CreateResponse(HttpStatusCode.NoContent);
         }
 
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing) Service.Dispose();
+            if (disposing)
+                Service.Dispose();
             base.Dispose(disposing);
         }
     }

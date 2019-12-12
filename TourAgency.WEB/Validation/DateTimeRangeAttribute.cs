@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 
 namespace TourAgency.WEB.Validation
 {
@@ -51,7 +47,7 @@ namespace TourAgency.WEB.Validation
                 }
                 else
                 {
-                    return new ValidationResult("Incorrect time gap haha ou lose", new[] { validationContext.MemberName, MaxTimePropertyName });
+                    return new ValidationResult("Incorrect time gap", new[] { validationContext.MemberName, MaxTimePropertyName });
                 }
 
             }

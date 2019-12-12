@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace TourAgency.WEB.Models
+﻿namespace TourAgency.WEB.Models
 {
     public class UserModel
     {
@@ -11,5 +6,6 @@ namespace TourAgency.WEB.Models
         public string UserName { get; set; }
         public string Email { get; set; }
         public int? CityId { get; set; }
+        public string Role { get; set; }
     }
 }

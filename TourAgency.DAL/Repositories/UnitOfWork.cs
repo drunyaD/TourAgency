@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNet.Identity.EntityFramework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TourAgency.DAL.EF;
 using TourAgency.DAL.Entities;
 using TourAgency.DAL.Identity;
@@ -13,7 +9,7 @@ namespace TourAgency.DAL.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private bool _disposed;
+        private bool _disposed = false;
         private readonly AgencyContext _db;
         private Repository<City> _cityRepository;
         private Repository<Tour> _tourRepository;
@@ -52,19 +48,20 @@ namespace TourAgency.DAL.Repositories
 
         public void Save()
         {
-           
-           _db.SaveChanges();         
-          
+
+            _db.SaveChanges();
+
         }
 
         public virtual void Dispose(bool disposing)
         {
-            if (!_disposed) return;
+            if (_disposed)
+                return;
             if (disposing)
             {
-                _db.Dispose();
-                _userManager.Dispose();
-                _roleManager.Dispose();
+                _db?.Dispose();
+                _userManager?.Dispose();
+                _roleManager?.Dispose();
             }
 
             _disposed = true;

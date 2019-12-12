@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TourAgency.DAL.Interfaces;
 
 namespace TourAgency.DAL.Repositories
@@ -26,7 +24,8 @@ namespace TourAgency.DAL.Repositories
 
         public void Update(T item)
         {
-            _context.Entry(item).State = EntityState.Modified;
+            _context.Entry(item)
+                .State = EntityState.Modified;
         }
 
         public void Delete(T item)
@@ -36,7 +35,8 @@ namespace TourAgency.DAL.Repositories
 
         public IEnumerable<T> Find(Func<T, bool> predicate)
         {
-            return _dbSet.Where(predicate).ToList();
+            return _dbSet.Where(predicate)
+                .ToList();
         }
 
         public T Get(int id)
@@ -46,7 +46,8 @@ namespace TourAgency.DAL.Repositories
 
         public IEnumerable<T> GetAll()
         {
-            return _dbSet.AsNoTracking().ToList();
+            return _dbSet.AsNoTracking()
+                .ToList();
         }
     }
 }

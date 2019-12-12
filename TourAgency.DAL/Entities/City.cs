@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TourAgency.DAL.Entities
 {
@@ -12,10 +8,10 @@ namespace TourAgency.DAL.Entities
     {
         [Key] public int Id { get; set; }
         [Required] public string Name { get; set; }
-        [ForeignKey("Country")]
-        public int CountryId;
+        [ForeignKey("Country")] public int CountryId;
         [Required] public virtual Country Country { get; set; }
         public virtual ICollection<Node> Nodes { get; set; }
+
         public City()
         {
             Nodes = new HashSet<Node>();

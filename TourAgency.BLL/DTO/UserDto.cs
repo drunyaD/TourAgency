@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace TourAgency.BLL.DTO
 {
@@ -17,6 +12,6 @@ namespace TourAgency.BLL.DTO
         [Required]
         public string UserName { get; set; }
         public int? CityId { get; set; }
-        public string Role { get; set; }    
+        public string RoleId { get; set; }    
     }
 }
