@@ -13,12 +13,12 @@ namespace TourAgency.BLL.DTO
         [Required] public DateTime FinishDate { get; set; }
         [Required] public int Price { get; set; }
         [Required] public int MaxCapacity { get; set; }
-        public ICollection<byte[]> Images { get; set; }
+        public ICollection<string> Images { get; set; }
         public IList<CityDto> Cities { get; set; }
         public ICollection<string> UserNames { get; set; }
         public TourDto()
         {
-            Images = new HashSet<byte[]>();
+            Images = new HashSet<string>();
             Cities = new List<CityDto>();
             UserNames = new HashSet<string>();
         }

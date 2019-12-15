@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.IO;
+
 using System.Linq;
 using TourAgency.BLL.DTO;
 using TourAgency.BLL.Interfaces;
@@ -393,6 +396,39 @@ namespace TourAgency.BLL.Services
             tour.Users.Remove(user);
             Database.Tours.Update(tour);
             Database.Save();
+        }
+
+        public void CreateImages(IEnumerable<ImageDto> imageDtos)
+        {
+            var tour = Database.Tours.Get(imageDtos.First().TourId);
+            var existingImgs = Database.Images.Find(i => i.TourId == tour.Id);
+            foreach (var img in existingImgs)
+            {
+                Database.Images.Delete(img);
+            }
+            for (int i = 0; i < imageDtos.Count(); i++)
+            {
+                var pict = imageDtos.ElementAt(i);
+                string link = "\\Images\\" + $"{pict.FileName}";
+
+                using (pict.File)
+                {
+                    using (FileStream filestream = File.Open(
+                                 "C:\\Users\\Dell\\source\\repos\\TourAgency\\TourAgency.WEB\\wwwroot" + link, FileMode.OpenOrCreate))
+                    {
+                        pict.File.CopyTo(filestream);
+                        filestream.Flush();
+                    }
+                }
+
+                Database.Images.Create(new Image
+                {
+                    Picture = link.Replace("\\", "/"),
+                    TourId = pict.TourId,
+                    Tour = tour
+                });
+                Database.Save();
+            }
         }
     }
 }

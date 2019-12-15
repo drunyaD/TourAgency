@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="DTO\CityDto.cs" />
     <Compile Include="DTO\CountryDto.cs" />
+    <Compile Include="DTO\ImageDto.cs" />
     <Compile Include="DTO\RoleDto.cs" />
     <Compile Include="DTO\TourDto.cs" />
     <Compile Include="DTO\UserDto.cs" />
