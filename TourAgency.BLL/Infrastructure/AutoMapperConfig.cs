@@ -16,8 +16,9 @@ namespace TourAgency.BLL.Infrastructure
             {
                 config.CreateMap<Role, RoleDto>();
 
-                config.CreateMap<Image, byte[]>()
-                    .ConstructUsing(i => i.Picture);
+                config.CreateMap<Image, string>()
+                .ConstructUsing(i => i.Picture.Replace("\\\\", "\\"));
+
 
                 config.CreateMap<Node, CityDto>()
                     .ForMember(c => c.Name,
@@ -47,15 +48,13 @@ namespace TourAgency.BLL.Infrastructure
                 config.CreateMap<Country, CountryDto>();
 
                 config.CreateMap<Tour, TourDto>()
-                    .ForMember(t => t.UserNames,
-                        t => t
-                            .MapFrom(e => Mapper.Map<IEnumerable<User>, IEnumerable<String>>(e.Users)))
-                    .ForMember(t => t.Cities,
-                        t => t
-                            .MapFrom(e => Mapper.Map<IEnumerable<Node>, IEnumerable<CityDto>>(e.Nodes
-                                .OrderBy(n => n.OrderNumber))))
-                    .ForMember(t => t.Images,
-                        t => t.MapFrom(e => Mapper.Map<IEnumerable<Image>, IEnumerable<byte[]>>(e.Images)));
+                .ForMember(t => t.UserNames, t => t
+                .MapFrom(e => Mapper.Map<IEnumerable<User>, IEnumerable<String>>(e.Users)))
+                .ForMember(t => t.Cities, t => t
+                .MapFrom(e => Mapper.Map<IEnumerable<Node>, IEnumerable<CityDto>>(e.Nodes
+                .OrderBy(n => n.OrderNumber))))
+                .ForMember(t => t.Images, t => t.MapFrom(e => Mapper.Map<IEnumerable<Image>, IEnumerable<string>>(e.Images)));
+
             });
 #pragma warning restore CS0618 
         }

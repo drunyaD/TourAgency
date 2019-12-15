@@ -15,6 +15,7 @@ namespace BLLUnitTests
 {
     public class TourServiceTests
     {
+        /*
         [Fact]
         public void AddTourWithCorrectCitiesReturnTourId()
         {
@@ -83,6 +84,6 @@ namespace BLLUnitTests
             Action addingTour = () => service.AddTour(tourDto);
 
             Assert.Throws<ValidationException>(addingTour);
-        }
+        }*/
     }
 }

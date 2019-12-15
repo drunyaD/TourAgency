@@ -107,7 +107,7 @@ namespace TourAgency.WEB.Controllers
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
-
+             
         }
 
         [HttpDelete]
@@ -126,8 +126,6 @@ namespace TourAgency.WEB.Controllers
                     e.Message);
             }
         }
-
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)
