@@ -17,8 +17,7 @@ namespace TourAgency.BLL.Infrastructure
                 config.CreateMap<Role, RoleDto>();
 
                 config.CreateMap<Image, string>()
-                .ConstructUsing(i => i.Picture);
-
+                .ConstructUsing(i => i.Picture.Replace("\\\\", "\\"));
 
 
                 config.CreateMap<Node, CityDto>()

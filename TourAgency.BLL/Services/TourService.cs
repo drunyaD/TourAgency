@@ -409,12 +409,12 @@ namespace TourAgency.BLL.Services
             for (int i = 0; i < imageDtos.Count(); i++)
             {
                 var pict = imageDtos.ElementAt(i);
-                string link = $"{pict.FileName}";
+                string link = "\\Images\\" + $"{pict.FileName}";
 
                 using (pict.File)
                 {
                     using (FileStream filestream = File.Open(
-                                 "D:\\Images\\" + link, FileMode.OpenOrCreate))
+                                 "C:\\Users\\Dell\\source\\repos\\TourAgency\\TourAgency.WEB\\wwwroot" + link, FileMode.OpenOrCreate))
                     {
                         pict.File.CopyTo(filestream);
                         filestream.Flush();
@@ -423,7 +423,7 @@ namespace TourAgency.BLL.Services
 
                 Database.Images.Create(new Image
                 {
-                    Picture = "D:\\Images\\" + link,
+                    Picture = link.Replace("\\", "/"),
                     TourId = pict.TourId,
                     Tour = tour
                 });
